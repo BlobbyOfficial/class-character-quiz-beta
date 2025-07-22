@@ -11,6 +11,7 @@ This quiz is the BETA verison of the website.
 The full version will be coming soon!
 
 Currently, going to the website link [https://BlobbyOfficial.github.io/class-character-quiz/](https://BlobbyOfficial.github.io/class-character-quiz/), will redirect you to [https://blobbyofficial.github.io/class-character-quiz-beta/](https://blobbyofficial.github.io/class-character-quiz-beta/).
+
 ---
 
 ## 🚀 What’s This All About?
