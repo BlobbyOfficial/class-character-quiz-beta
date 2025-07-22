@@ -1,0 +1,815 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What Kind of Classmate Are You?</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap');
+        
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+            min-height: 100vh;
+        }
+        
+        .quiz-container {
+            max-width: 800px;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .answer-btn {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .answer-btn:before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.2);
+            transition: all 0.3s;
+            z-index: -1;
+        }
+        
+        .answer-btn:hover:before {
+            width: 100%;
+        }
+        
+        .answer-btn.selected {
+            transform: scale(0.98);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .result-emoji {
+            font-size: 80px;
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, #4f46e5, #818cf8);
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="quiz-container mx-auto p-6 md:p-10 fade-in">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-5xl font-bold text-indigo-600 mb-2">What Kind of Classmate Are You?</h1>
+            <p class="text-gray-600 text-lg md:text-xl">Answer honestly to discover your classroom personality!</p>
+        </header>
+        
+        <!-- Progress Bar -->
+        <div class="progress-bar mb-8">
+            <div class="progress" id="progress-fill" style="width: 0%"></div>
+        </div>
+        
+        <!-- Quiz Content -->
+        <div id="quiz-content" class="fade-in">
+            <!-- Questions will be inserted here by JavaScript -->
+        </div>
+        
+        <!-- Results (initially hidden) -->
+        <div id="results" class="text-center py-8 hidden fade-in">
+            <div class="result-emoji mb-6">😎</div>
+            <h2 id="result-title" class="text-3xl md:text-4xl font-bold text-indigo-600 mb-4">Your Result</h2>
+            <p id="result-description" class="text-xl text-gray-700 mb-8 max-w-2xl mx-auto">Description goes here</p>
+            <button id="restart-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full text-lg transition-all">
+                Take the Quiz Again
+            </button>
+            <div class="mt-8 text-gray-500">
+                Share your result with friends!
+                <div class="flex justify-center gap-4 mt-3">
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
+                        </svg>
+                    </button>
+                    <button class="bg-blue-700 hover:bg-blue-800 text-white p-3 rounded-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/>
+                        </svg>
+                    </button>
+                    <button class="bg-pink-600 hover:bg-pink-700 text-white p-3 rounded-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Quiz data structure with branching questions
+        const quizData = {
+            // Starting question
+            start: {
+                id: 'start',
+                question: "You walk into class. What do you do?",
+                answers: [
+                    { text: "Sit down quietly", nextQuestion: "q2a" },
+                    { text: "Shout 'HELLOOOO CLASS!'", nextQuestion: "q2b" },
+                    { text: "Ask to go to the toilet", nextQuestion: "q2c" },
+                    { text: "Walk in backwards like it's normal", nextQuestion: "q2d" },
+                    { text: "Dramatically announce your arrival with jazz hands ✨", nextQuestion: "q_new1" } // New path to first new question
+                ]
+            },
+            
+            // Branch 1: Quiet student path
+            q2a: {
+                id: 'q2a',
+                question: "The teacher calls on you. What do you say?",
+                answers: [
+                    { text: "Uhh... sorry", nextQuestion: "q3a1" },
+                    { text: "*You just blink slowly*", nextQuestion: "q3a2" }
+                ]
+            },
+            q3a1: {
+                id: 'q3a1',
+                question: "During group work, you:",
+                answers: [
+                    { text: "Do all the work yourself", nextQuestion: "q4a1" },
+                    { text: "Try to contribute but get talked over", nextQuestion: "q4a2" }
+                ]
+            },
+            q3a2: {
+                id: 'q3a2',
+                question: "At lunch break, where are you?",
+                answers: [
+                    { text: "Reading in a quiet corner", nextQuestion: "q4a3" },
+                    { text: "Eating alone while watching videos", nextQuestion: "q4a4" },
+                    { text: "Secretly feeding the classroom pet 🐹", nextQuestion: "q_new2" } // Link to new question
+                ]
+            },
+            q4a1: {
+                id: 'q4a1',
+                question: "When you get your test back with an A+, you:",
+                answers: [
+                    { text: "Hide it immediately", result: "perfectionist" },
+                    { text: "Feel relieved but say nothing", result: "silent_achiever" }
+                ]
+            },
+            q4a2: {
+                id: 'q4a2',
+                question: "Someone asks to copy your homework. You:",
+                answers: [
+                    { text: "Let them, to avoid confrontation", result: "pushover" },
+                    { text: "Politely decline and offer to help instead", result: "helper" }
+                ]
+            },
+            q4a3: {
+                id: 'q4a3',
+                question: "If you could have any superpower in class, it would be:",
+                answers: [
+                    { text: "Invisibility", result: "wallflower" },
+                    { text: "Mind reading", result: "observer" }
+                ]
+            },
+            q4a4: {
+                id: 'q4a4',
+                question: "When there's a fire drill:",
+                answers: [
+                    { text: "You follow everyone else quietly", result: "follower" },
+                    { text: "You're already prepared with the evacuation route memorized", result: "prepared" }
+                ]
+            },
+            
+            // Branch 2: Loud/extroverted student path
+            q2b: {
+                id: 'q2b',
+                question: "During a quiet test, you:",
+                answers: [
+                    { text: "Tap your pen loudly without realizing", nextQuestion: "q3b1" },
+                    { text: "Finish first and make sure everyone knows it", nextQuestion: "q3b2" },
+                    { text: "Communicate with your friend using elaborate eyebrow signals 🤨", nextQuestion: "q_new3" } // Link to new question
+                ]
+            },
+            q3b1: {
+                id: 'q3b1',
+                question: "When the teacher makes a mistake:",
+                answers: [
+                    { text: "You point it out loudly", nextQuestion: "q4b1" },
+                    { text: "You whisper about it to your friends", nextQuestion: "q4b2" }
+                ]
+            },
+            q3b2: {
+                id: 'q3b2',
+                question: "At a class party, you're most likely to:",
+                answers: [
+                    { text: "Take over the music selection", nextQuestion: "q4b3" },
+                    { text: "Start an impromptu dance competition", nextQuestion: "q4b4" }
+                ]
+            },
+            q4b1: {
+                id: 'q4b1',
+                question: "Your desk is:",
+                answers: [
+                    { text: "Covered in doodles and stickers", result: "class_clown" },
+                    { text: "Organized but with fidget toys hidden inside", result: "energetic" }
+                ]
+            },
+            q4b2: {
+                id: 'q4b2',
+                question: "When giving a presentation, you:",
+                answers: [
+                    { text: "Add jokes even if they're not relevant", result: "entertainer" },
+                    { text: "Talk so fast the teacher asks you to slow down", result: "enthusiast" }
+                ]
+            },
+            q4b3: {
+                id: 'q4b3',
+                question: "Your favorite class activity is:",
+                answers: [
+                    { text: "Debates where you can argue your point", result: "debater" },
+                    { text: "Group presentations where you take the lead", result: "leader" }
+                ]
+            },
+            q4b4: {
+                id: 'q4b4',
+                question: "Your classmates would describe you as:",
+                answers: [
+                    { text: "The life of the party", result: "social_butterfly" },
+                    { text: "Loud but lovable", result: "drama_queen" }
+                ]
+            },
+            
+            // Branch 3: Bathroom excuse maker path
+            q2c: {
+                id: 'q2c',
+                question: "When assigned homework, you:",
+                answers: [
+                    { text: "Say your dog ate it", nextQuestion: "q3c1" },
+                    { text: "Actually do it, but at the last minute", nextQuestion: "q3c2" }
+                ]
+            },
+            q3c1: {
+                id: 'q3c1',
+                question: "During a pop quiz, you:",
+                answers: [
+                    { text: "Try to peek at your neighbor's paper", nextQuestion: "q4c1" },
+                    { text: "Suddenly develop a 'headache'", nextQuestion: "q4c2" }
+                ]
+            },
+            q3c2: {
+                id: 'q3c2',
+                question: "When the bell rings at the end of class:",
+                answers: [
+                    { text: "You're already packed up and ready to bolt", nextQuestion: "q4c3" },
+                    { text: "You ask the teacher a question to avoid the hallway rush", nextQuestion: "q4c4" },
+                    { text: "You pretend to drop all your books to delay leaving 📚", nextQuestion: "q_new4" } // Link to new question
+                ]
+            },
+            q4c1: {
+                id: 'q4c1',
+                question: "Your backpack contains:",
+                answers: [
+                    { text: "Everything except what you need for class", result: "unprepared" },
+                    { text: "Snacks to eat secretly during lessons", result: "snacker" }
+                ]
+            },
+            q4c2: {
+                id: 'q4c2',
+                question: "When called to the board to solve a problem:",
+                answers: [
+                    { text: "You make up an excuse to stay seated", result: "avoider" },
+                    { text: "You go but stall for time", result: "procrastinator" }
+                ]
+            },
+            q4c3: {
+                id: 'q4c3',
+                question: "Your attendance record is:",
+                answers: [
+                    { text: "Spotty with mysterious absences", result: "skipper" },
+                    { text: "Perfect, but you're mentally absent", result: "daydreamer" }
+                ]
+            },
+            q4c4: {
+                id: 'q4c4',
+                question: "Your favorite school day is:",
+                answers: [
+                    { text: "Field trip day when routines change", result: "free_spirit" },
+                    { text: "Half days or any shortened schedule", result: "minimalist" }
+                ]
+            },
+            
+            // Branch 4: Quirky student path
+            q2d: {
+                id: 'q2d',
+                question: "Your notebook is full of:",
+                answers: [
+                    { text: "Elaborate doodles instead of notes", nextQuestion: "q3d1" },
+                    { text: "Strange symbols only you understand", nextQuestion: "q3d2" },
+                    { text: "A detailed map of an imaginary school you've created 🏫", nextQuestion: "q_new5" } // Link to new question
+                ]
+            },
+            q3d1: {
+                id: 'q3d1',
+                question: "When the teacher asks for volunteers:",
+                answers: [
+                    { text: "You raise both hands and one foot", nextQuestion: "q4d1" },
+                    { text: "You volunteer for the weirdest tasks", nextQuestion: "q4d2" }
+                ]
+            },
+            q3d2: {
+                id: 'q3d2',
+                question: "During lunch, you're known for:",
+                answers: [
+                    { text: "Eating foods in bizarre combinations", nextQuestion: "q4d3" },
+                    { text: "Trading items for increasingly strange things", nextQuestion: "q4d4" }
+                ]
+            },
+            q4d1: {
+                id: 'q4d1',
+                question: "Your locker decoration style is:",
+                answers: [
+                    { text: "Covered in memes and inside jokes", result: "meme_lord" },
+                    { text: "A chaotic art installation that confuses everyone", result: "artist" }
+                ]
+            },
+            q4d2: {
+                id: 'q4d2',
+                question: "For spirit week, you:",
+                answers: [
+                    { text: "Create a costume no one understands but you", result: "trendsetter" },
+                    { text: "Interpret the theme in the most literal way possible", result: "literal_thinker" }
+                ]
+            },
+            q4d3: {
+                id: 'q4d3',
+                question: "Your science project is:",
+                answers: [
+                    { text: "Something no one else would think of", result: "innovator" },
+                    { text: "Technically meets requirements but in a bizarre way", result: "rule_bender" }
+                ]
+            },
+            q4d4: {
+                id: 'q4d4',
+                question: "If you found a strange object in the hallway, you would:",
+                answers: [
+                    { text: "Add it to your collection of random things", result: "collector" },
+                    { text: "Create an elaborate backstory for it", result: "storyteller" }
+                ]
+            },
+            
+            // NEW QUESTION 1: Jazz hands entrance question
+            q_new1: {
+                id: 'q_new1',
+                question: "The principal walks by right as you're doing your jazz hands. What's your next move? 👀",
+                answers: [
+                    { text: "Pretend you're stretching for gym class", nextQuestion: "q3b1" }, // Normal answer
+                    { text: "Say you're practicing for the school musical", nextQuestion: "q3b2" }, // Normal answer
+                    { text: "Teach the principal how to do jazz hands too", result: "confidence_king" }, // Bizarre answer
+                    { text: "Freeze in position until they walk away, then continue", result: "commitment_champion" }, // Bizarre answer
+                    { text: "Ask if they've seen your lost pet narwhal 🦄", result: "random_royalty" } // Random answer
+                ]
+            },
+            
+            // NEW QUESTION 2: Classroom pet question
+            q_new2: {
+                id: 'q_new2',
+                question: "The classroom hamster 🐹 starts making weird noises after you feed it. What do you do?",
+                answers: [
+                    { text: "Quietly tell the teacher what happened", nextQuestion: "q4a3" }, // Normal answer
+                    { text: "Pretend you don't know anything about it", nextQuestion: "q4a4" }, // Normal answer
+                    { text: "Start making the same noises back at the hamster", result: "animal_whisperer" }, // Bizarre answer
+                    { text: "Convince everyone the hamster is speaking in code", result: "conspiracy_theorist" }, // Bizarre answer
+                    { text: "Write a dramatic obituary just in case 📝", result: "pessimistic_poet" } // Random answer
+                ]
+            },
+            
+            // NEW QUESTION 3: Eyebrow signals question
+            q_new3: {
+                id: 'q_new3',
+                question: "Your eyebrow signals are intercepted by the teacher! They ask what you're doing. You say:",
+                answers: [
+                    { text: "You have something in your eye", nextQuestion: "q4b1" }, // Normal answer
+                    { text: "You're practicing facial expressions for drama class", nextQuestion: "q4b2" }, // Normal answer
+                    { text: "You're communicating with aliens 👽", result: "space_cadet" }, // Bizarre answer
+                    { text: "It's a rare medical condition called 'Eyebrowitis'", result: "creative_excuser" }, // Bizarre answer
+                    { text: "You ask if they want to join your eyebrow workout routine", result: "distraction_master" } // Random answer
+                ]
+            },
+            
+            // NEW QUESTION 4: Dropped books question
+            q_new4: {
+                id: 'q_new4',
+                question: "While picking up your 'accidentally' dropped books, you find a mysterious note under a desk. What do you do? 📝",
+                answers: [
+                    { text: "Hand it to the teacher without reading it", nextQuestion: "q4c3" }, // Normal answer
+                    { text: "Quickly read it then put it back", nextQuestion: "q4c4" }, // Normal answer
+                    { text: "Add to it and start a secret message chain", result: "mystery_maker" }, // Bizarre answer
+                    { text: "Convince everyone it's a treasure map of the school", result: "adventure_starter" }, // Bizarre answer
+                    { text: "Eat it to destroy the evidence 😋", result: "paper_muncher" } // Random answer
+                ]
+            },
+            
+            // NEW QUESTION 5: Imaginary school map question
+            q_new5: {
+                id: 'q_new5',
+                question: "Your teacher notices your imaginary school map and asks you to explain it to the class. What features do you highlight? 🏫",
+                answers: [
+                    { text: "The practical layout and efficient design", nextQuestion: "q4d3" }, // Normal answer
+                    { text: "The creative spaces for student activities", nextQuestion: "q4d4" }, // Normal answer
+                    { text: "The secret passages and trap doors for escaping boring classes", result: "escape_artist" }, // Bizarre answer
+                    { text: "The dragon in the basement that powers the heating system", result: "fantasy_architect" }, // Bizarre answer
+                    { text: "The cafeteria that serves only foods that start with the letter 'P' 🍕", result: "peculiar_planner" } // Random answer
+                ]
+            }
+        };
+        
+        // Results definitions
+        const results = {
+            // Quiet path results
+            perfectionist: {
+                emoji: "📊",
+                title: "The Perfectionist",
+                description: "You're never satisfied with 'good enough.' Your assignments are immaculate, your handwriting is flawless, and you've color-coded your entire life. The teacher uses your work as an example, which secretly makes you both proud and anxious."
+            },
+            silent_achiever: {
+                emoji: "🥇",
+                title: "The Silent Achiever",
+                description: "You excel without making a fuss. While others brag about their B+, you quietly tuck away your A+ and move on to the next challenge. You're the student teachers love but classmates might not notice until graduation when you collect all the awards."
+            },
+            pushover: {
+                emoji: "🧸",
+                title: "The Pushover Pal",
+                description: "Your notes are legendary because everyone has a copy. You can't say no when classmates ask for 'help,' which usually means doing their work. You're too nice for your own good, but secretly wish you could stand up for yourself."
+            },
+            helper: {
+                emoji: "🤝",
+                title: "The Helpful Sidekick",
+                description: "You're everyone's academic lifeline. Instead of giving answers, you patiently explain concepts. Teachers love you, struggling students need you, and you genuinely enjoy being the classroom's unofficial teaching assistant."
+            },
+            wallflower: {
+                emoji: "🌱",
+                title: "The Wallflower",
+                description: "You've mastered the art of blending in. You could be absent for a week and no one would notice. But you notice everything - who's dating, who's fighting, and which teacher is having a bad day. Your superpower is invisibility with excellent observation skills."
+            },
+            observer: {
+                emoji: "👁️",
+                title: "The Silent Observer",
+                description: "You know all the classroom drama without being part of it. You rarely speak, but when you do, everyone listens because you've been quietly analyzing everything. Your insights are surprisingly accurate, making people wonder what else you know."
+            },
+            follower: {
+                emoji: "🐑",
+                title: "The Faithful Follower",
+                description: "You go with the flow and never make waves. You're reliable, consistent, and always do what's expected. While not standing out in any particular way, classes would feel incomplete without your steady presence in the back row."
+            },
+            prepared: {
+                emoji: "🧠",
+                title: "The Perpetually Prepared",
+                description: "You have backup pencils for your backup pencils. Your emergency kit could handle anything from a paper cut to a zombie apocalypse. While others panic about deadlines, you've finished assignments weeks early. You're quietly judging everyone's lack of preparation."
+            },
+            
+            // Loud path results
+            class_clown: {
+                emoji: "🎭",
+                title: "The Class Clown",
+                description: "You perform like you're on stage. You fall over for laughs. Every marker is a mic. Your jokes interrupt class, but even the teacher secretly enjoys them. Learning happens between your punchlines, and somehow you still pass tests despite spending more time on comedy than studying."
+            },
+            energetic: {
+                emoji: "⚡",
+                title: "The Energizer Bunny",
+                description: "You vibrate with constant energy. Sitting still is your nemesis. You tap, bounce, drum, and fidget your way through every class. Teachers have given up asking you to stay in your seat, and classmates wonder what would happen if you ever drank coffee."
+            },
+            entertainer: {
+                emoji: "🎪",
+                title: "The Class Entertainer",
+                description: "Your presentations are legendary performances. You've never met a spotlight you didn't like. Even your excuses for late homework are so creative and dramatically delivered that teachers almost want to applaud instead of giving you detention."
+            },
+            enthusiast: {
+                emoji: "🚀",
+                title: "The Enthusiastic Overachiever",
+                description: "Everything excites you! You raise your hand so much it might fall off. You volunteer first, talk fast, and approach group projects like they're Olympic events. Your energy is exhausting but infectious, making even boring classes more bearable."
+            },
+            debater: {
+                emoji: "⚖️",
+                title: "The Devil's Advocate",
+                description: "You'll argue any point, even ones you don't believe in. 'Actually...' is your favorite word. Teachers both love and fear calling on you, knowing a simple question might turn into a 10-minute debate. You see every conversation as a winnable contest."
+            },
+            leader: {
+                emoji: "👑",
+                title: "The Born Leader",
+                description: "You naturally take charge of every situation. Group projects? You're assigning roles before the teacher finishes explaining. Class president? Obviously. You organize, delegate, and command respect, though some classmates find you a bit bossy."
+            },
+            social_butterfly: {
+                emoji: "🦋",
+                title: "The Social Butterfly",
+                description: "You know everyone and everyone knows you. Your social calendar is fuller than your academic planner. You float between friend groups effortlessly, collecting gossip and spreading good vibes. Somehow you maintain decent grades despite prioritizing your social life."
+            },
+            drama_queen: {
+                emoji: "👑",
+                title: "The Drama Monarch",
+                description: "Everything is a crisis or celebration - there's no in-between. You react to a pop quiz like it's the end of the world and to a good grade like you've won an Oscar. Your emotional range is impressive, and your theatrical reactions make mundane school days more entertaining."
+            },
+            
+            // Bathroom excuse path results
+            unprepared: {
+                emoji: "🤷",
+                title: "The Perpetually Unprepared",
+                description: "You never have a pen, paper, or textbook. Your backpack is a black hole where assignments disappear. You've mastered the art of borrowing supplies and creating excuses. Somehow you still manage to scrape by, leaving everyone wondering how you do it."
+            },
+            snacker: {
+                emoji: "🍪",
+                title: "The Secret Snacker",
+                description: "You've perfected the art of eating in class without getting caught. Your desk drawer is better stocked than the cafeteria. You know which foods make the least noise and have mastered the sleeve-to-mouth technique. You're everyone's go-to for mid-class hunger emergencies."
+            },
+            avoider: {
+                emoji: "🙈",
+                title: "The Master Avoider",
+                description: "You have an excuse for everything. Homework? Dog ate it. Presentation? Sudden laryngitis. Test? Emergency dentist appointment. Your creativity in avoiding responsibility is almost admirable. Teachers are onto you but can't help being impressed by your dedication to dodging work."
+            },
+            procrastinator: {
+                emoji: "⏰",
+                title: "The Professional Procrastinator",
+                description: "Why do today what can be done tomorrow... or five minutes before it's due? You thrive under pressure and produce your best work at 3 AM. Your time management is terrible yet somehow functional. You're constantly stressed but refuse to change your last-minute ways."
+            },
+            skipper: {
+                emoji: "🏃",
+                title: "The Strategic Skipper",
+                description: "You attend just enough classes to stay enrolled. You've calculated exactly how many days you can miss without failing. Your absence notes are works of fiction that should win literary awards. When you do show up, teachers do a double-take to make sure it's really you."
+            },
+            daydreamer: {
+                emoji: "💭",
+                title: "The Professional Daydreamer",
+                description: "Physically present, mentally on another planet. You stare out windows and create elaborate fantasies while lessons happen around you. Teachers often catch you with that glazed-over look. You've perfected the art of snapping back to attention when your name is called."
+            },
+            free_spirit: {
+                emoji: "🦅",
+                title: "The Free Spirit",
+                description: "Rules and schedules are merely suggestions to you. You follow your own internal compass, which often leads you away from conventional academics. You question why things are done certain ways and march to the beat of your own drum, inspiring both admiration and frustration."
+            },
+            minimalist: {
+                emoji: "🧘",
+                title: "The Classroom Minimalist",
+                description: "You've streamlined education to its bare essentials. Why take notes when you can just take a picture? Why bring five notebooks when one will do? You put in exactly the minimum effort required to pass, no more, no less. Your efficiency is both impressive and concerning."
+            },
+            
+            // Quirky path results
+            meme_lord: {
+                emoji: "😂",
+                title: "The Meme Lord",
+                description: "Your references are too advanced for most teachers. You communicate primarily through obscure internet jokes and react to serious situations with perfectly timed memes. Your assignments often include hidden jokes that only your fellow internet citizens understand."
+            },
+            artist: {
+                emoji: "🎨",
+                title: "The Abstract Artist",
+                description: "Your notes are incomprehensible masterpieces. Where others see math problems, you see design opportunities. Your margins are filled with elaborate doodles that sometimes connect to the lesson in ways only you understand. Teachers aren't sure if you're a genius or completely lost."
+            },
+            trendsetter: {
+                emoji: "💫",
+                title: "The Classroom Trendsetter",
+                description: "You start fads without even trying. That weird thing you did becomes what everyone's doing next week. You wear, say, and do the unexpected, making ordinary school days more interesting. You're not trying to stand out - you just naturally do things differently."
+            },
+            literal_thinker: {
+                emoji: "🔍",
+                title: "The Literal Thinker",
+                description: "You interpret everything exactly as stated, often with hilarious results. When the teacher says 'take a minute to think,' you watch the clock for exactly 60 seconds. Your unique perspective leads to questions no one else would think to ask, sometimes derailing entire lessons."
+            },
+            innovator: {
+                emoji: "💡",
+                title: "The Classroom Innovator",
+                description: "You find unconventional solutions to conventional problems. Your projects never look like anyone else's because you're always thinking outside the box - so far outside that sometimes teachers aren't sure what box you started from. Your creativity is both your greatest strength and challenge."
+            },
+            rule_bender: {
+                emoji: "🔄",
+                title: "The Rule Bender",
+                description: "You follow instructions... technically. You find the loopholes in every assignment and exploit them creatively. Teachers have learned to be extremely specific with you, and your assignments often come back with notes like 'This isn't what I meant, but I can't say you're wrong.'"
+            },
+            collector: {
+                emoji: "🧲",
+                title: "The Random Collector",
+                description: "Your desk, locker, and pockets are filled with treasures others would call trash. Bottle caps, interesting rocks, paperclips bent into shapes - you collect it all. You can always produce the strangest object at the most unexpected moment, leaving classmates wondering what else you have."
+            },
+            storyteller: {
+                emoji: "📚",
+                title: "The Imaginative Storyteller",
+                description: "You transform mundane school events into epic tales. That pencil on the floor? Part of an international spy conspiracy. The substitute teacher? Clearly a superhero in disguise. Your imagination turns boring school days into adventures, and your classmates tune in for the daily installment."
+            },
+            
+            // NEW RESULTS for new questions
+            confidence_king: {
+                emoji: "👐",
+                title: "The Confidence King/Queen",
+                description: "You have absolutely no shame and it's your superpower. When caught doing something embarrassing, you double down and own it. By the end of the year, you'll have the entire faculty doing jazz hands in the hallway. Your confidence is so powerful it bends reality around you."
+            },
+            commitment_champion: {
+                emoji: "🏆",
+                title: "The Commitment Champion",
+                description: "Once you start something, you see it through—no matter how awkward. You'd rather stand frozen with jazz hands for 20 minutes than admit defeat. Your dedication to bits is legendary, and your willingness to endure discomfort for a joke earns both respect and concern."
+            },
+            random_royalty: {
+                emoji: "🦄",
+                title: "The Random Royalty",
+                description: "Your brain operates on a wavelength no one else can access. You make connections between things that have no business being connected. The narwhal comment wasn't even your weirdest today. People never know what you'll say next, which makes you both entertaining and slightly concerning."
+            },
+            animal_whisperer: {
+                emoji: "🐾",
+                title: "The Animal Whisperer",
+                description: "You believe you can communicate with classroom pets on a spiritual level. You've developed elaborate translation systems for hamster squeaks and fish bubbles. Half the class thinks you're joking, the other half isn't sure, and the pets definitely prefer you to everyone else."
+            },
+            conspiracy_theorist: {
+                emoji: "🕵️",
+                title: "The Classroom Conspiracy Theorist",
+                description: "Everything is connected in your mind. The hamster isn't just making noise—it's clearly transmitting government secrets. You see patterns where others see coincidence. Your theories are elaborate, mostly harmless, and occasionally accidentally correct, which only encourages you further."
+            },
+            pessimistic_poet: {
+                emoji: "📝",
+                title: "The Pessimistic Poet",
+                description: "You prepare for the worst in the most eloquent way possible. Your hamster obituary included five stanzas and a haiku. You're always ready with a dramatic speech for any minor inconvenience. Your English teacher is simultaneously impressed and worried about you."
+            },
+            space_cadet: {
+                emoji: "👽",
+                title: "The Space Cadet",
+                description: "Your mind exists partially in another dimension. Aliens aren't just a joke to you—they're potential pen pals. You genuinely believe there's more to this world than others see, and your bizarre explanations sometimes make more sense than they should. The truth is out there, and you're determined to eyebrow-signal it."
+            },
+            creative_excuser: {
+                emoji: "🎭",
+                title: "The Creative Excuser",
+                description: "You never admit to anything without an elaborate cover story. Your excuses are so creative they deserve their own literary genre. 'Eyebrowitis' is just the beginning—you've got medical conditions, distant relatives, and freak weather phenomena ready to explain away any situation."
+            },
+            distraction_master: {
+                emoji: "🎯",
+                title: "The Distraction Master",
+                description: "When caught doing something wrong, you don't deny—you distract! Your ability to change subjects and create diversions is unmatched. Before teachers realize what's happening, they're somehow participating in your eyebrow workout class instead of disciplining you. It's your superpower."
+            },
+            mystery_maker: {
+                emoji: "🔍",
+                title: "The Mystery Maker",
+                description: "You create intrigue wherever you go. A simple note becomes an underground communication network under your influence. You thrive on secrets and hidden messages, turning the ordinary school day into an elaborate mystery novel where you're both author and protagonist."
+            },
+            adventure_starter: {
+                emoji: "🗺️",
+                title: "The Adventure Starter",
+                description: "You see potential for excitement in the mundane. A scrap of paper becomes a treasure map, a closed classroom door becomes a portal to another dimension. Your enthusiasm for turning everyday objects into quests is infectious, and classmates find themselves drawn into your imaginative scenarios."
+            },
+            paper_muncher: {
+                emoji: "🍽️",
+                title: "The Paper Muncher",
+                description: "Your solution to problematic evidence is... unconventional. You've eaten more school supplies than most students use in a year. Notes, homework you didn't do, embarrassing drawings—all have mysteriously disappeared into your digestive system. Your stomach is the most secure vault in school."
+            },
+            escape_artist: {
+                emoji: "🔓",
+                title: "The Escape Artist",
+                description: "School is basically prison to you, and you've mentally mapped every possible exit route. Your imaginary school design includes no fewer than 17 secret passages and emergency slides. In real school, you've discovered which bathroom windows don't lock and which teachers don't take attendance."
+            },
+            fantasy_architect: {
+                emoji: "🐉",
+                title: "The Fantasy Architect",
+                description: "Reality is just a suggestion in your designs. Why have boring boilers when you could have dragons? Your imagination transforms mundane spaces into magical realms. Teachers are both impressed by your creativity and concerned about your grasp on reality, but your presentations are never boring."
+            },
+            peculiar_planner: {
+                emoji: "🍕",
+                title: "The Peculiar Planner",
+                description: "You organize the world according to systems only you understand. Alphabetical cafeterias, color-coded hallways, classrooms arranged by astrological sign—your mind creates order through strange constraints. Your plans are simultaneously brilliant and bizarre, leaving everyone wondering how your brain works."
+            }
+        };
+        
+        // Track quiz state
+        let currentQuestion = 'start';
+        let questionPath = [];
+        
+        // DOM elements
+        const quizContent = document.getElementById('quiz-content');
+        const resultsDiv = document.getElementById('results');
+        const resultTitle = document.getElementById('result-title');
+        const resultDescription = document.getElementById('result-description');
+        const resultEmoji = document.querySelector('.result-emoji');
+        const progressFill = document.getElementById('progress-fill');
+        const restartBtn = document.getElementById('restart-btn');
+        
+        // Initialize the quiz
+        function initQuiz() {
+            currentQuestion = 'start';
+            questionPath = [];
+            showQuestion(quizData.start);
+            resultsDiv.classList.add('hidden');
+            updateProgress();
+        }
+        
+        // Display a question
+        function showQuestion(questionData) {
+            // Create question container
+            const questionHTML = `
+                <div class="mb-8 fade-in">
+                    <h2 class="text-2xl md:text-3xl font-bold text-indigo-800 mb-6">${questionData.question}</h2>
+                    <div class="space-y-4" id="answers-container">
+                        ${questionData.answers.map((answer, index) => `
+                            <button class="answer-btn w-full text-left p-4 rounded-xl bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-medium text-lg transition-all" 
+                                    data-index="${index}">
+                                ${answer.text}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            // Update the DOM
+            quizContent.innerHTML = questionHTML;
+            
+            // Add event listeners to answer buttons
+            const answerButtons = document.querySelectorAll('.answer-btn');
+            answerButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Mark as selected
+                    answerButtons.forEach(btn => btn.classList.remove('selected'));
+                    button.classList.add('selected');
+                    
+                    // Disable all buttons to prevent multiple clicks
+                    answerButtons.forEach(btn => btn.disabled = true);
+                    
+                    // Get the selected answer
+                    const answerIndex = parseInt(button.getAttribute('data-index'));
+                    const selectedAnswer = questionData.answers[answerIndex];
+                    
+                    // Record this step in the path
+                    questionPath.push({
+                        question: questionData.id,
+                        answer: answerIndex
+                    });
+                    
+                    // Proceed after a short delay
+                    setTimeout(() => {
+                        if (selectedAnswer.nextQuestion) {
+                            // Go to next question
+                            currentQuestion = selectedAnswer.nextQuestion;
+                            showQuestion(quizData[selectedAnswer.nextQuestion]);
+                        } else if (selectedAnswer.result) {
+                            // Show result
+                            showResult(selectedAnswer.result);
+                        }
+                        updateProgress();
+                    }, 500);
+                });
+            });
+        }
+        
+        // Show the final result
+        function showResult(resultId) {
+            const result = results[resultId];
+            
+            // Update result content
+            resultEmoji.textContent = result.emoji;
+            resultTitle.textContent = result.title;
+            resultDescription.textContent = result.description;
+            
+            // Hide questions, show results
+            quizContent.classList.add('hidden');
+            resultsDiv.classList.remove('hidden');
+            
+            // Set progress to 100%
+            progressFill.style.width = '100%';
+        }
+        
+        // Update progress bar
+        function updateProgress() {
+            // Estimate progress based on question depth
+            // Most paths are 4 questions deep
+            const progress = Math.min((questionPath.length / 4) * 100, 100);
+            progressFill.style.width = `${progress}%`;
+        }
+        
+        // Restart the quiz
+        restartBtn.addEventListener('click', initQuiz);
+        
+        // Start the quiz
+        initQuiz();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'962d51800090417d',t:'MTc1MzEyODM4MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
